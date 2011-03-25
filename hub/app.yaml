@@ -26,6 +26,11 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
   secure: optional
+  
+- url: /wizard\.jpg
+  static_files: wizard.jpg
+  upload: wizard\.jpg
+  secure: optional
 
 - url: /remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
