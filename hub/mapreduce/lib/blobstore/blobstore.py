@@ -15,19 +15,12 @@
 # limitations under the License.
 #
 
-
-
-
 """A Python blobstore API used by app developers.
 
 Contains methods used to interface with Blobstore API.  Includes db.Model-like
 class representing a reference to a very large BLOB.  Imports db.Key-like
 class representing a blob-key.
 """
-
-
-
-
 
 
 
@@ -84,8 +77,6 @@ BLOB_RANGE_HEADER = blobstore.BLOB_RANGE_HEADER
 MAX_BLOB_FETCH_SIZE = blobstore.MAX_BLOB_FETCH_SIZE
 UPLOAD_INFO_CREATION_HEADER = blobstore.UPLOAD_INFO_CREATION_HEADER
 
-
-
 class _GqlQuery(db.GqlQuery):
   """GqlQuery class that explicitly sets model-class.
 
@@ -97,7 +88,6 @@ class _GqlQuery(db.GqlQuery):
   mechanism but will be removed in the future.  DO NOT USE.
   """
 
-
   def __init__(self, query_string, model_class, *args, **kwds):
     """Constructor.
 
@@ -107,16 +97,11 @@ class _GqlQuery(db.GqlQuery):
       *args: Positional arguments used to bind numeric references in the query.
       **kwds: Dictionary-based arguments for named references.
     """
-
-
     from google.appengine.ext import gql
     app = kwds.pop('_app', None)
     self._proto_query = gql.GQL(query_string, _app=app, namespace='')
-
     super(db.GqlQuery, self).__init__(model_class, namespace='')
     self.bind(*args, **kwds)
-
-
 
 
 class BlobInfo(object):
@@ -178,8 +163,6 @@ class BlobInfo(object):
     else:
       TypeError('Must provide Entity or BlobKey')
 
-
-
   @classmethod
   def from_entity(cls, entity):
     """Convert entity to BlobInfo.
@@ -188,8 +171,6 @@ class BlobInfo(object):
     mechanism but will be removed in the future.  DO NOT USE.
     """
     return BlobInfo(entity)
-
-
 
   @classmethod
   def properties(cls):
@@ -233,16 +214,6 @@ class BlobInfo(object):
   def delete(self):
     """Permanently delete blob from Blobstore."""
     delete(self.key())
-
-  def open(self, *args, **kwargs):
-    """Returns a BlobReader for this blob.
-
-    Args:
-      *args, **kwargs: Passed to BlobReader constructor.
-    Returns:
-      A BlobReader instance.
-    """
-    return BlobReader(self, *args, **kwargs)
 
   @classmethod
   def get(cls, blob_keys):
@@ -310,7 +281,6 @@ class BlobInfo(object):
                      *args,
                      **kwds)
 
-
   @classmethod
   def kind(self):
     """Get the entity kind for the BlobInfo.
@@ -335,7 +305,6 @@ class BlobInfo(object):
     """
     if isinstance(keys, (list, tuple)):
       multiple = True
-
       keys = list(keys)
     else:
       multiple = False
@@ -508,25 +477,21 @@ class BlobReader(object):
   SEEK_CUR = 1
   SEEK_END = 2
 
-  def __init__(self, blob, buffer_size=131072, position=0):
+  def __init__(self, blob_key, buffer_size=131072, position=0):
     """Constructor.
 
     Args:
-      blob: The blob key, blob info, or string blob key to read from.
+      blob_key: The blob key or string blob key to read from.
       buffer_size: The minimum size to fetch chunks of data from blobstore.
       position: The initial position in the file.
     """
-    if hasattr(blob, 'key'):
-      self.__blob_key = blob.key()
-      self.__blob_info = blob
-    else:
-      self.__blob_key = blob
-      self.__blob_info = None
+    self.__blob_key = blob_key
     self.__buffer_size = buffer_size
     self.__buffer = ""
     self.__position = position
     self.__buffer_position = 0
     self.__eof = False
+    self.__blob_info = None
 
   def __iter__(self):
     """Returns a file iterator for this BlobReader."""
@@ -574,7 +539,6 @@ class BlobReader(object):
         data: The bytes read from the buffer.
         size: The remaining unread byte count.
     """
-
     if not self.__blob_key:
       raise ValueError("File is closed")
 
@@ -584,12 +548,10 @@ class BlobReader(object):
       end_pos = self.__buffer_position + size
     data = self.__buffer[self.__buffer_position:end_pos]
 
-
     data_length = len(data)
     size -= data_length
     self.__position += data_length
     self.__buffer_position += data_length
-
 
     if self.__buffer_position == len(self.__buffer):
       self.__buffer = ""
@@ -605,7 +567,6 @@ class BlobReader(object):
         [self.__buffer_size, MAX_BLOB_FETCH_SIZE].
     """
     read_size = min(max(size, self.__buffer_size), MAX_BLOB_FETCH_SIZE)
-
     self.__buffer = fetch_data(self.__blob_key, self.__position,
                                self.__position + read_size - 1)
     self.__buffer_position = 0
@@ -660,13 +621,11 @@ class BlobReader(object):
         end_pos = self.__buffer_position + size
       newline_pos = self.__buffer.find('\n', self.__buffer_position, end_pos)
       if newline_pos != -1:
-
         data_list.append(
             self.__read_from_buffer(newline_pos
                                     - self.__buffer_position + 1)[0])
         break
       else:
-
         data, size = self.__read_from_buffer(size)
         data_list.append(data)
         if size == 0 or self.__eof:
@@ -693,7 +652,6 @@ class BlobReader(object):
       if sizehint:
         sizehint -= len(line)
       if not line:
-
         break
       lines.append(line)
     return lines

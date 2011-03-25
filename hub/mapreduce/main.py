@@ -29,12 +29,9 @@ This module should be specified as a handler for mapreduce URLs in app.yaml:
 import wsgiref.handlers
 
 from google.appengine.ext import webapp
+from google.appengine.ext.webapp import util
 from mapreduce import handlers
 from mapreduce import status
-from google.appengine.ext.webapp import util
-
-
-STATIC_RE = r".*/([^/]*\.(?:css|js)|status|detail)$"
 
 
 class RedirectHandler(webapp.RequestHandler):
@@ -42,39 +39,11 @@ class RedirectHandler(webapp.RequestHandler):
 
   def get(self):
     new_path = self.request.path
-    if not new_path.endswith("/"):
-      new_path += "/"
-    new_path += "status"
+    if not new_path.endswith('/'):
+      new_path += '/'
+    new_path += 'status'
     self.redirect(new_path)
 
-
-def create_handlers_map():
-  """Create new handlers map.
-
-  Returns:
-    list of (regexp, handler) pairs for WSGIApplication constructor.
-  """
-  return [
-      # Task queue handlers.
-      (r".*/worker_callback", handlers.MapperWorkerCallbackHandler),
-      (r".*/controller_callback", handlers.ControllerCallbackHandler),
-      (r".*/kickoffjob_callback", handlers.KickOffJobHandler),
-
-      # RPC requests with JSON responses
-      # All JSON handlers should have /command/ prefix.
-      (r".*/command/start_job", handlers.StartJobHandler),
-      (r".*/command/cleanup_job", handlers.CleanUpJobHandler),
-      (r".*/command/abort_job", handlers.AbortJobHandler),
-      (r".*/command/list_configs", status.ListConfigsHandler),
-      (r".*/command/list_jobs", status.ListJobsHandler),
-      (r".*/command/get_job_detail", status.GetJobDetailHandler),
-
-      # UI static files
-      (STATIC_RE, status.ResourceHandler),
-
-      # Redirect non-file URLs that do not end in status/detail to status page.
-      (r".*", RedirectHandler),
-      ]
 
 def create_application():
   """Create new WSGIApplication and register all handlers.
@@ -83,7 +52,27 @@ def create_application():
     an instance of webapp.WSGIApplication with all mapreduce handlers
     registered.
   """
-  return webapp.WSGIApplication(create_handlers_map(),
+  return webapp.WSGIApplication([
+
+      # Task queue handlers.
+      (r".*/worker_callback", handlers.MapperWorkerCallbackHandler),
+      (r".*/controller_callback", handlers.ControllerCallbackHandler),
+      (r".*/kickoffjob_callback", handlers.KickOffJobHandler),
+
+      # RPC requests with JSON responses
+      (r".*/command/start_job", handlers.StartJobHandler),
+      (r".*/command/cleanup_job", handlers.CleanUpJobHandler),
+      (r".*/command/abort_job", handlers.AbortJobHandler),
+      (r".*/command/list_configs", status.ListConfigsHandler),
+      (r".*/command/list_jobs", status.ListJobsHandler),
+      (r".*/command/get_job_detail", status.GetJobDetailHandler),
+
+      # Catch all redirects to status page.
+      (r"/[^/]+(?:/)?", RedirectHandler),
+
+      # UI static files
+      (r".+/([a-zA-Z0-9]+(?:\.(?:css|js))?)", status.ResourceHandler),
+  ],
   debug=True)
 
 

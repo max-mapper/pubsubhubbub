@@ -109,9 +109,6 @@ function cleanUpJob(name, mapreduce_id) {
       var response = getResponseDataJson(null, data);
       if (response) {
         setButter(response.status);
-        if (!response.status.error) {
-          $('#row-' + mapreduce_id).remove();
-        }
       }
     }
   });
@@ -247,7 +244,7 @@ function initJobOverview(jobs, cursor) {
 
   // Populate the table.
   $.each(jobs, function(index, job) {
-    var row = $('<tr id="row-' + job.mapreduce_id + '">');
+    var row = $('<tr>');
 
     // TODO: Style running colgroup for capitalization.
     var status = (job.active ? 'running' : job.result_status) || 'unknown';

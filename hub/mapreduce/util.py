@@ -18,14 +18,11 @@
 
 
 
-__all__ = ["for_name", "is_generator_function", "get_short_name", "parse_bool",
-           "create_datastore_write_config"]
+__all__ = ["for_name", "is_generator_function", "get_short_name", "parse_bool"]
 
 
 import inspect
 import logging
-
-from google.appengine.datastore import datastore_rpc
 
 
 def for_name(fq_name, recursive=False):
@@ -142,21 +139,3 @@ def parse_bool(obj):
     return obj.lower() in TRUTH_VALUE_SET
   else:
     return bool(obj)
-
-
-def create_datastore_write_config(mapreduce_spec):
-  """Creates datastore config to use in write operations.
-
-  Args:
-    mapreduce_spec: current mapreduce specification as MapreduceSpec.
-
-  Returns:
-    an instance of datastore_rpc.Configuration to use for all write
-    operations in the mapreduce.
-  """
-  force_writes = parse_bool(mapreduce_spec.params.get("force_writes", "false"))
-  if force_writes:
-    return datastore_rpc.Configuration(force_writes=force_writes)
-  else:
-    # dev server doesn't support force_writes.
-    return datastore_rpc.Configuration()
