@@ -64,6 +64,7 @@ class JsonHandler(BaseHandler):
       self.json_response["error_message"] = str(e)
 
     self.response.headers["Content-Type"] = "text/javascript"
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
     try:
       output = simplejson.dumps(self.json_response)
     except:

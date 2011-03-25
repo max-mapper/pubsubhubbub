@@ -2004,6 +2004,7 @@ class SubscribeHandler(webapp.RequestHandler):
   @dos.limit(param='hub.callback', count=10, period=1)
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
 
     callback = self.request.get('hub.callback', '')
     topic = self.request.get('hub.topic', '')
@@ -2293,6 +2294,7 @@ class PublishHandler(PublishHandlerBase):
   @dos.limit(count=100, period=1)
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
 
     mode = self.request.get('hub.mode')
     if mode.lower() != 'publish':

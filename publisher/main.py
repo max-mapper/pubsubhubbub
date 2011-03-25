@@ -78,6 +78,7 @@ class FeedHandler(webapp.RequestHandler):
     if messages:
       context['first_message'] = messages[0]
     self.response.headers['content-type'] = 'application/xml'
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
     self.response.out.write(template.render('atom.xml', context))
 
 

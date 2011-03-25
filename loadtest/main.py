@@ -33,6 +33,7 @@ class FeedHandler(webapp.RequestHandler):
 
   def get(self, name):
     self.response.headers['Content-Type'] = 'application/xml+atom'
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
     self.response.out.write(template.render('atom.xml', {
       'self_url': self.request.url,
       'all_ids': random.sample(xrange(10**9), 25),

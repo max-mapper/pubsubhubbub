@@ -265,6 +265,7 @@ class ResourceHandler(base_handler.BaseHandler):
     path = os.path.join(os.path.dirname(__file__), "static", real_path)
     self.response.headers["Cache-Control"] = "public; max-age=300"
     self.response.headers["Content-Type"] = content_type
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
     self.response.out.write(open(path).read())
 
 
