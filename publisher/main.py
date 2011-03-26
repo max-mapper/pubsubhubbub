@@ -45,7 +45,7 @@ class MainHandler(webapp.RequestHandler):
     self.response.out.write(template.render('input.html', context))
 
   def post(self):
-    hub_url = self.request.get('hub')
+    hub_url = "http://www.psychicwarlock.com/publish"
     message = Message(title=self.request.get('title'),
                       content=self.request.get('content'))
     message.put()
@@ -53,7 +53,7 @@ class MainHandler(webapp.RequestHandler):
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     post_params = {
       'hub.mode': 'publish',
-      'hub.url': self.request.host_url + '/feed',
+      'hub.url': 'http://www.psychicwarlock.com/publish',
     }
     payload = urllib.urlencode(post_params)
     try:
